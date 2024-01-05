@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "moex-alerter-bot"
+version = "0.1.0"
+description = ""
+authors = ["aleksandr.chesnov"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "^3.3.0"
+aiohttp = "^3.9.1"
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+ruff = "^0.1.13"
+
+[tool.poetry.scripts]
+moex_alerter_bot="moex_alerter_bot.main:run"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
