@@ -1,0 +1,25 @@
+name: BOT CD
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Deploy using ssh
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: 22
+        script: |
+          [ ! -d "/opt/git/moex-alerter-bot" ] && mkdir -p /opt/git && cd /opt/git && git clone https://github.com/AChesnov/moex-alerter-bot.git
+          cd /opt/git/moex-alerter-bot
+          ls -l
+          git pull origin main
+          git status
+          systemctl enable /opt/git/moex-alerter-bot/systemd/moex_alerter_bot.service
+          systemctl start moex_alerter_bot.service
