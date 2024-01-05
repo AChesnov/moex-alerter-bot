@@ -10,16 +10,36 @@ jobs:
 
     - name: Deploy using ssh
       uses: appleboy/ssh-action@master
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        CHAT_ID: ${{ secrets.CHAT_ID }}
+        GIT_URL: "https://github.com/AChesnov/moex-alerter-bot.git"
+        CONFIG_FILE: ".env"
+        WORK_DIR: '/opt/git/moex-alerter-bot'
+        LOG_FILE: '/var/log/moex-alerter-bot.log'
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USERNAME }}
         password: ${{ secrets.VPS_PASSWORD }}
         port: 22
+        envs: BOT_TOKEN,GIT_URL,CONFIG_FILE,WORK_DIR,LOG_FILE
         script: |
-          [ ! -d "/opt/git/moex-alerter-bot" ] && mkdir -p /opt/git && cd /opt/git && git clone https://github.com/AChesnov/moex-alerter-bot.git
-          cd /opt/git/moex-alerter-bot
+          echo "Update repo sources"
+          [ ! -d $WORK_DIR ] && mkdir -p /opt/git && cd /opt/git && git clone $GIT_URL
+          cd $WORK_DIR
           ls -l
-          git pull origin main
-          git status
+          git fetch
+          git checkout origin/master
+          git pull origin master
+          
+          echo "Copy configs"
+          rm -rf $CONFIG_FILE
+          echo BOT_TOKEN = $BOT_TOKEN >> $CONFIG_FILE
+          echo CHAT_ID = $CHAT_ID >> $CONFIG_FILE
+          echo LOG_FILE = $LOG_FILE >> $CONFIG_FILE
+          echo WEBHOOK_URL = https://s251991.hostiman.com/moex_alerter_bot >> $CONFIG_FILE
+          
+          echo "Start service"
+          /root/.local/bin/poetry install --without dev
           systemctl enable /opt/git/moex-alerter-bot/systemd/moex_alerter_bot.service
-          systemctl start moex_alerter_bot.service
+          systemctl restart moex_alerter_bot.service

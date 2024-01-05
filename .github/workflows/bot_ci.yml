@@ -1,6 +1,6 @@
 name: BOT CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -18,21 +18,29 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    
-    - name: Install Dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        pip install mypy
-        pip install ruff
 
-    - name: List dir
-      run: ls -l
+    - name: Install poetry
+      run: |
+        pip install pipx
+        pipx install poetry
+
+    - name: Validate the structure of the pyproject.toml
+      run: poetry check
+
+    - name: Verify that poetry.lock is consistent with pyproject.toml
+      run: poetry lock --check
+
+    - name: Install dependencies
+      run: poetry install
 
     - name: Ruff check
-      run: ruff check --fix $(git ls-files '*.py')
+      run: poetry run ruff check --fix $(git ls-files '*.py')
 
     - name: Ruff format
-      run: ruff format $(git ls-files '*.py')
+      run: poetry run ruff format $(git ls-files '*.py')
 
     - name: Mypy
-      run: mypy --ignore-missing-imports $(git ls-files '*.py')
+      run: poetry run mypy --ignore-missing-imports $(git ls-files '*.py')
+
+    - name: Pytest
+      run: poetry run pytest -v

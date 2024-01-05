@@ -5,11 +5,12 @@ After=network.target
 [Service]
 User=root
 Group=root
-Type=simple
+
 WorkingDirectory=/opt/git/moex-alerter-bot
-ExecStart=/root/.local/bin/poetry run aiogram_bot_template
-EnvironmentFile=/opt/git/moex-alerter-bot/.env
-Restart=always
+ExecStart=/root/.local/bin/poetry run moex_alerter_bot
+
+Restart=on-failure
+RestartSec=2s
 
 [Install]
 WantedBy=multi-user.target

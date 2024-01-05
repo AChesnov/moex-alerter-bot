@@ -8,13 +8,13 @@ FILES="$(git ls-files '*.py')"
 
 function check_git_diff() {
     echo -e "${GREEN}Run ruff fix:${NC}"
-    ruff check --fix ${FILES}
+    poetry run ruff check --fix ${FILES}
 
     echo -e "${GREEN}Run ruff format fix:${NC}"
-    ruff format ${FILES}
+    poetry run ruff format ${FILES}
 
     echo -e "${GREEN}Run mypy check:${NC}"
-    mypy ${FILES}
+    poetry run mypy ${FILES}
 }
 
 check_git_diff

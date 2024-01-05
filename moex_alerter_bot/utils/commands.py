@@ -12,4 +12,4 @@ async def set_commands(bot: Bot):
         BotCommand(command="settings", description="Настройки"),
     ]
     result = await bot.set_my_commands(commands=commands)
-    LOGGER.info(result)
+    LOGGER.info("Set commands result: %s", result)

@@ -7,12 +7,18 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.108.0"
-uvicorn = "^0.25.0"
 aiogram = "^3.3.0"
-ruff = "^0.1.11"
-mypy = "^1.8.0"
+aiohttp = "^3.9.1"
+python-dotenv = "^1.0.0"
 
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+ruff = "^0.1.13"
+pytest = "^7.4.4"
+
+[tool.poetry.scripts]
+moex_alerter_bot="moex_alerter_bot.main:run"
 
 [build-system]
 requires = ["poetry-core"]

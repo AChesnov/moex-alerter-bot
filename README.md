@@ -1,1 +1,1 @@
-# moex-alerter-bot
+# moex-alerter-bot ![Build Status](https://github.com/AChesnov/moex-alerter-bot/actions/workflows/bot_ci.yml/badge.svg?branch=master) ![Build Status](https://github.com/AChesnov/moex-alerter-bot/actions/workflows/bot_cd.yml/badge.svg?branch=master) 
