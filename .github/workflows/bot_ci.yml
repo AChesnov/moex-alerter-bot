@@ -31,6 +31,7 @@ jobs:
 
     - name: Run linters
       run: |
+        ls -l 
         ./moex_alerter_bot/linter.sh
     
     # - name: Run Tests
