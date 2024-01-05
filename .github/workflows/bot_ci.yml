@@ -1,10 +1,6 @@
 name: BOT CI
 
-on: [pull_request, push]
-  # push:
-  #   branches: [ "main" ]
-  # pull_request:
-  #   branches: [ "main" ]
+on: [push]
 
 jobs:
   build:
@@ -29,11 +25,14 @@ jobs:
         pip install mypy
         pip install ruff
 
-    - name: Run linters
-      run: |
-        ls -l 
-        bash ./linter.sh
-    
-    # - name: Run Tests
-    #   run: |
-    #     python manage.py test
+    - name: List dir
+      run: ls -l
+
+    - name: Ruff check
+      run: ruff check --fix $(git ls-files '*.py')
+
+    - name: Ruff format
+      run: ruff format $(git ls-files '*.py')
+
+    - name: Mypy
+      run: mypy --ignore-missing-imports $(git ls-files '*.py')
