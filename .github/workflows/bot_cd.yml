@@ -19,11 +19,13 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         port: 22
         script: |
+          echo "$PROJECT_DIR"
           if [ ! -d "$PROJECT_DIR"]; then
             mkdir -p /opt/git
             cd /opt/git
             git clone https://github.com/AChesnov/moex-alerter-bot.git
           fi
           cd $PROJECT_DIR
+          ls -l
           git pull origin main
           git status
