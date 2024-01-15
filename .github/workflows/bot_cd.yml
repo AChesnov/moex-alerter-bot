@@ -19,8 +19,8 @@ jobs:
           [ ! -d "/opt/git/moex-alerter-bot" ] && mkdir -p /opt/git && cd /opt/git && git clone https://github.com/AChesnov/moex-alerter-bot.git
           cd /opt/git/moex-alerter-bot
           ls -l
-          git checkout origin/main
+          git checkout origin/master
           git fetch
-          git pull origin main
+          git pull origin master
           systemctl enable /opt/git/moex-alerter-bot/systemd/moex_alerter_bot.service
           systemctl start moex_alerter_bot.service
