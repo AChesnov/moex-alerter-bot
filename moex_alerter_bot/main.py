@@ -1,15 +1,15 @@
-from moex_alerter_bot.config import (
-    WEBHOOK_PATH,
-    BOT_TOKEN,
-    WEB_SERVER_HOST,
-    WEB_SERVER_PORT,
-)
-from moex_alerter_bot.utils.basic import on_shutdown, on_startup
-
-from aiogram import Dispatcher, Bot
+from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
+
+from moex_alerter_bot.config import (
+    BOT_TOKEN,
+    WEB_SERVER_HOST,
+    WEB_SERVER_PORT,
+    WEBHOOK_PATH,
+)
+from moex_alerter_bot.utils.basic import on_shutdown, on_startup
 
 
 def run():
@@ -41,5 +41,5 @@ def run():
     web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run()

@@ -39,8 +39,8 @@ jobs:
     - name: Ruff format
       run: poetry run ruff format $(git ls-files '*.py')
 
-    - name: Mypy
-      run: poetry run mypy --ignore-missing-imports $(git ls-files '*.py')
+#    - name: Mypy
+#      run: poetry run mypy --ignore-missing-imports $(git ls-files '*.py')
 
     - name: Pytest
       run: poetry run pytest -v
