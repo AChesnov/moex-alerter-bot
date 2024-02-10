@@ -29,7 +29,7 @@ class MoexApiClient:
         return [row.attrs for row in rows if row.attrs.get('BOARDID') == self.board_id]
 
     @staticmethod
-    def parse_stock_tickers(rows: list[dict[str, str]]) -> list[Stock]:
+    def parse_stock_tickers(rows: list[dict[str, str]]) -> list[Stock] | None:
         return [Stock(name=row['SECID'], short_name=row['SHORTNAME']) for row in rows if row.get('SHORTNAME')]
 
     async def get_tickers(self) -> list[Stock]:
@@ -37,3 +37,11 @@ class MoexApiClient:
         rows = self.parse_row_from_text(text=result)
         stocks = self.parse_stock_tickers(rows)
         return stocks
+
+    async def get_ticker(self, ticker_name: str) -> Stock | None:
+        """Возвращаем информацию по акции если она есть"""
+        result = await self.send_request(path=f'/iss/engines/stock/markets/shares/securities/{ticker_name.upper()}.xml')
+        rows = self.parse_row_from_text(text=result)
+        stocks = self.parse_stock_tickers(rows)
+        if stocks:
+            return stocks[0]

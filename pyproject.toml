@@ -19,6 +19,7 @@ asyncpg = "^0.29.0"
 
 
 [tool.ruff]
+# https://docs.astral.sh/ruff/rules/
 line-length = 120
 select = [
     # Pyflakes
@@ -333,7 +334,8 @@ ignore = [
     "INP001",
     "S101",
     "PLW1508",
-    "S104"
+    "S104",
+    "RUF002"
 ]
 
 [tool.ruff.format]
