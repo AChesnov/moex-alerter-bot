@@ -10,7 +10,334 @@ python = "^3.11"
 aiogram = "^3.3.0"
 aiohttp = "^3.9.1"
 python-dotenv = "^1.0.0"
+beautifulsoup4 = "^4.12.3"
+httpx = "^0.26.0"
+lxml = "^5.1.0"
+sqlalchemy = "^2.0.25"
+alembic = "^1.13.1"
+asyncpg = "^0.29.0"
 
+
+[tool.ruff]
+line-length = 120
+select = [
+    # Pyflakes
+    # https://beta.ruff.rs/docs/rules/#pyflakes-f
+    "F",
+
+    # pycodestyle Error
+    # https://beta.ruff.rs/docs/rules/#error-e
+    # https://beta.ruff.rs/docs/settings/#pycodestyle
+    "E",
+
+    # pycodestyle Warning
+    # https://beta.ruff.rs/docs/rules/#warning-w
+    # https://beta.ruff.rs/docs/settings/#pycodestyle
+    "W",
+
+    # mccabe
+    # https://beta.ruff.rs/docs/rules/#mccabe-c90
+    # https://beta.ruff.rs/docs/settings/#mccabe
+    # Не нужно, содержит только одно правило на проверку сложности функции.
+    # У нас много мест где есть большая вложенность, вряд ли разумно включать правило чтоб постоянно распутывать эти клубки.
+#    "C90",
+
+    # isort
+    # https://beta.ruff.rs/docs/rules/#isort-i
+    # https://beta.ruff.rs/docs/settings/#isort
+    "I",
+
+    # pep8-naming
+    # https://beta.ruff.rs/docs/rules/#pep8-naming-n
+    # https://beta.ruff.rs/docs/settings/#pep8-naming
+    "N",
+
+    # pydocstyle
+    # https://beta.ruff.rs/docs/rules/#pydocstyle-d
+    # https://beta.ruff.rs/docs/settings/#pydocstyle
+    # Очень много правил, которые не применимы к нам в полной мере.
+    # Часть правил включена через опцию `extend-select`.
+#    "D",
+
+    # pyupgrade
+    # https://beta.ruff.rs/docs/rules/#pyupgrade-up
+    "UP",
+
+    # flake8-2020
+    # https://beta.ruff.rs/docs/rules/#flake8-2020-ytt
+    # Почти не применимо к нам, нет смысла использовать.
+#    "YTT",
+
+    # flake8-annotations
+    # https://beta.ruff.rs/docs/rules/#flake8-annotations-ann
+    # https://beta.ruff.rs/docs/settings/#flake8-annotations
+    # Нет смысла внедрять, т.к. типизация в нашем проекте не обязательна (но желательна)
+#    "ANN",
+
+    # flake8-async
+    # https://beta.ruff.rs/docs/rules/#flake8-async-async
+    # Пока что нет асинхронщины, нет смысла внедрять
+#    "ASYNC",
+
+    # flake8-bandit
+    # https://beta.ruff.rs/docs/rules/#flake8-bandit-s
+    # https://beta.ruff.rs/docs/settings/#flake8-bandit
+    "S",
+
+    # flake8-blind-except
+    # https://beta.ruff.rs/docs/rules/#flake8-blind-except-ble
+    # Одно бессмысленное правило
+#    "BLE",
+
+    # flake8-boolean-trap
+    # https://beta.ruff.rs/docs/rules/#flake8-boolean-trap-fbt
+    # Данные правила противоречат тому, что мы не указываем дефолтные значения для аргументов
+#    "FBT",
+
+    # flake8-bugbear
+    # https://beta.ruff.rs/docs/rules/#flake8-bugbear-b
+    # https://beta.ruff.rs/docs/settings/#flake8-bugbear
+    "B",
+
+    # flake8-builtins
+    # https://beta.ruff.rs/docs/rules/#flake8-builtins-a
+    # https://beta.ruff.rs/docs/settings/#flake8-builtins
+    "A",
+
+    # flake8-commas
+    # https://beta.ruff.rs/docs/rules/#flake8-commas-com
+    "COM",
+
+    # flake8-comprehensions
+    # https://beta.ruff.rs/docs/rules/#flake8-comprehensions-c4
+    # https://beta.ruff.rs/docs/settings/#flake8-comprehensions
+    "C4",
+
+    # flake8-datetimez
+    # https://beta.ruff.rs/docs/rules/#flake8-datetimez-dtz
+    # У нас нет обязательности в использовании таймзон при каждом вызове datettime / date
+#    "DTZ",
+
+    # flake8-debugger
+    # https://beta.ruff.rs/docs/rules/#flake8-debugger-t10
+    "T10",
+
+    # flake8-django
+    # https://beta.ruff.rs/docs/rules/#flake8-django-dj
+    "DJ",
+
+    # flake8-errmsg
+    # https://beta.ruff.rs/docs/rules/#flake8-errmsg-em
+    # https://beta.ruff.rs/docs/settings/#flake8-errmsg
+    # Очень сомнительные правила, которые не принесут ощутимый толк
+#    "EM",
+
+    # flake8-executable
+    # https://beta.ruff.rs/docs/rules/#flake8-executable-exe
+    # Группа правил не применима к нашему коду (мы не пишем скрипты, которые запускаются напрямую).
+    # Полезно одно единственное правило EXE002, которое запускается отдельно через `extend-select`
+#    "EXE",
+
+    # flake8-future-annotations
+    # https://beta.ruff.rs/docs/rules/#flake8-future-annotations-fa
+    # Содержит одно единственное правило, которое нам не нужно (проверка наличия импорта аннотаций из future), т.к.
+    # наша версия python уже поддерживает аннотации без необходимости этого импорта
+#    "FA",
+
+    # flake8-implicit-str-concat
+    # https://beta.ruff.rs/docs/rules/#flake8-implicit-str-concat-isc
+    # https://beta.ruff.rs/docs/settings/#flake8-implicit-str-concat
+    "ISC",
+
+    # flake8-import-conventions
+    # https://beta.ruff.rs/docs/rules/#flake8-import-conventions-icn
+    # https://beta.ruff.rs/docs/settings/#flake8-import-conventions
+    # У нас нет таких импортов, для которых регламентированы соглашения о переименовании в короткую версию
+#    "ICN",
+
+    # flake8-logging-format
+    # https://beta.ruff.rs/docs/rules/#flake8-logging-format-g
+    "G",
+
+    # flake8-no-pep420
+    # https://beta.ruff.rs/docs/rules/#flake8-no-pep420-inp
+    "INP",
+
+    # flake8-pie
+    # https://beta.ruff.rs/docs/rules/#flake8-pie-pie
+    "PIE",
+
+    # flake8-print
+    # https://beta.ruff.rs/docs/rules/#flake8-print-t20
+    "T20",
+
+    # flake8-pyi
+    # https://beta.ruff.rs/docs/rules/#flake8-pyi-pyi
+    # Мы не пишем стаб-файлы с определением типов, нам это не нужно
+#    "PYI",
+
+    # flake8-pytest-style
+    # https://beta.ruff.rs/docs/rules/#flake8-pytest-style-pt
+    # https://beta.ruff.rs/docs/settings/#flake8-pytest-style
+    # Мы используем unittest, большинство правил для нас бесполезны
+#    "PT",
+
+    # flake8-quotes
+    # https://beta.ruff.rs/docs/rules/#flake8-quotes-q
+    # https://beta.ruff.rs/docs/settings/#flake8-quotes
+    "Q",
+
+    # flake8-raise
+    # https://beta.ruff.rs/docs/rules/#flake8-raise-rse
+    "RSE",
+
+    # flake8-return
+    # https://beta.ruff.rs/docs/rules/#flake8-return-ret
+    # Большинство правил весьма сомнительные и слишком холиварные, хорошие правила включены через `extend-select`
+#    "RET",
+
+    # flake8-self
+    # https://beta.ruff.rs/docs/rules/#flake8-self-slf
+    # https://beta.ruff.rs/docs/settings/#flake8-self
+    # Содержит одно правило, которое противоречит тому как мы привыкли делать: часто используем приватные класс-методы
+    # и обращаемся к ним извне (не из текущего класса). Это идеологически не правильно, но я сомневаюсь что стоит сейчас
+    # включать данную группу правил.
+#    "SLF",
+
+    # flake8-simplify
+    # https://beta.ruff.rs/docs/rules/#flake8-simplify-sim
+    "SIM",
+
+    # flake8-tidy-imports
+    # https://beta.ruff.rs/docs/rules/#flake8-tidy-imports-tid
+    # https://beta.ruff.rs/docs/settings/#flake8-tidy-imports
+    "TID",
+
+    # flake8-type-checking
+    # https://beta.ruff.rs/docs/rules/#flake8-type-checking-tch
+    # https://beta.ruff.rs/docs/settings/#flake8-type-checking
+    # Нет необходимости прятать импорты, относящиеся только к типам за проверку `typing.TYPE_CHECKING`
+#    "TCH",
+
+    # flake8-gettext
+    # https://beta.ruff.rs/docs/rules/#flake8-gettext-int
+    # https://beta.ruff.rs/docs/settings/#flake8-gettext
+    # Мы не используем i18n в проекте
+#    "INT",
+
+    # flake8-unused-arguments
+    # https://beta.ruff.rs/docs/rules/#flake8-unused-arguments-arg
+    # https://beta.ruff.rs/docs/settings/#flake8-unused-arguments
+    # Пока что отключено, т.к. не учитывает что у наследуемых методов не должна меняться сигнатура аргументов.
+    # У нас во всех дочерних классах `ApiResource` у части методов есть определение аргументов, которые не используются
+    # в самом методе.
+#    "ARG",
+
+    # flake8-use-pathlib
+    # https://beta.ruff.rs/docs/rules/#flake8-use-pathlib-pth
+    # Нет большого смысла заменять `builtins.open` на `Path.open` и все методы для работы с ФС на использование `Path`
+#    "PTH",
+
+    # flake8-todos
+    # https://beta.ruff.rs/docs/rules/#flake8-todos-td
+    # У нас нет правил по описанию тудушек в коде, пока что не актуально
+#    "TD",
+
+    # eradicate
+    # https://beta.ruff.rs/docs/rules/#eradicate-era
+    # Удаляет закомментированный код, зачастую некорректно (лишнее или не до конца что нужно)
+    # Зарепортил: https://github.com/charliermarsh/ruff/issues/4845
+#    "ERA",
+
+
+    # pandas-vet
+    # https://beta.ruff.rs/docs/rules/#pandas-vet-pd
+    # Мы не используем pandas
+#     "PD",
+
+    # pygrep-hooks
+    # https://beta.ruff.rs/docs/rules/#pygrep-hooks-pgh
+    "PGH",
+
+    # Pylint Convention
+    # https://beta.ruff.rs/docs/rules/#convention-plc
+    "PLC",
+
+    # Pylint Error
+    # https://beta.ruff.rs/docs/rules/#error-ple
+    "PLE",
+
+    # Pylint Refactor
+    # https://beta.ruff.rs/docs/rules/#refactor-plr
+    # https://beta.ruff.rs/docs/settings/#pylint
+    "PLR",
+
+    # Pylint Warning
+    # https://beta.ruff.rs/docs/rules/#warning-plw
+    "PLW",
+
+    # tryceratops
+    # https://beta.ruff.rs/docs/rules/#tryceratops-try
+    "TRY",
+
+    # flynt
+    # https://beta.ruff.rs/docs/rules/#flynt-fly
+    "FLY",
+
+    # NumPy-specific rules
+    # https://beta.ruff.rs/docs/rules/#numpy-specific-rules-npy
+    # У нас нет numpy
+#    "NPY",
+
+    # Ruff-specific rules
+    # https://beta.ruff.rs/docs/rules/#ruff-specific-rules-ruf
+    "RUF",
+]
+extend-select = [
+    # One-line docstring should fit on one line
+    "D200",
+
+    # No blank lines allowed before function docstring
+    "D201",
+
+    # Multi-line docstring closing quotes should be on a separate line
+    "D209",
+
+    # Use triple double quotes
+    "D300",
+
+    # Use `r"""` if any backslashes in a docstring
+    "D301",
+
+    # Docstring is empty
+    "D419",
+
+    # The file is executable but no shebang is present
+    # Проверяет что файл является исполняемым (`x` в любой из групп), вероятнее всего нужно снять с него это право
+    # с помощью `chmod -x path/to/file.py`
+    "EXE002",
+
+    # Unnecessary {branch} after return statement
+    "RET505",
+
+    # Unnecessary {branch} after raise statement
+    "RET506",
+
+    # Unnecessary {branch} after continue statement
+    "RET507",
+
+    # Unnecessary {branch} after break statement
+    "RET508",
+]
+ignore = [
+    "INP001",
+    "S101",
+    "PLW1508",
+    "S104"
+]
+
+[tool.ruff.format]
+quote-style = "single"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
