@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from moex_alerter_bot.config import DB_URL, LOGGER
 from moex_alerter_bot.models.stock import Stock, StockAnalyze
 
-engine = create_async_engine(DB_URL, echo=True, future=True)
+engine = create_async_engine(DB_URL, echo=False, future=True)
 ASYNC_SESSION = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
 
 

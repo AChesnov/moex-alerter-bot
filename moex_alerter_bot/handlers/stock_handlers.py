@@ -24,7 +24,7 @@ async def got_ticker_short_name(message: types.Message, state: FSMContext):
     await state.clear()
 
     moex_api = MoexApiClient()
-    if not await moex_api.get_ticker(ticker_name=context_data['name']):
+    if not await moex_api.get_ticker_info(ticker_name=context_data['name']):
         await message.answer(text='Stock not found via moex_api')
         return
 
