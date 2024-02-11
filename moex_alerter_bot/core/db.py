@@ -3,7 +3,7 @@ from typing import Type
 from sqlalchemy import delete, select
 from sqlalchemy.engine.result import ChunkedIteratorResult
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import selectinload, sessionmaker
 
 from moex_alerter_bot.config import DB_URL, LOGGER
 from moex_alerter_bot.models.stock import Stock, StockAnalyze
@@ -29,6 +29,14 @@ async def delete_object(object_type: Type[Stock] | Type[StockAnalyze], object_id
 
 async def get_stocks() -> list[Stock]:
     query = select(Stock)
+    LOGGER.debug(query)
+    async with ASYNC_SESSION() as session:
+        result: ChunkedIteratorResult = await session.execute(query)
+        return list(result.scalars().fetchall())
+
+
+async def get_stocks_analyze() -> list[StockAnalyze]:
+    query = select(StockAnalyze).options(selectinload(StockAnalyze.stock))
     LOGGER.debug(query)
     async with ASYNC_SESSION() as session:
         result: ChunkedIteratorResult = await session.execute(query)

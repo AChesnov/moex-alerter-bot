@@ -1,6 +1,5 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from moex_alerter_bot.core.moex_api_client import Stock
 from moex_alerter_bot.keyboards.callback_data import (
     MenuAction,
     MenuActionType,
@@ -8,6 +7,7 @@ from moex_alerter_bot.keyboards.callback_data import (
     StockAnalyzeActionType,
     StockSelected,
 )
+from moex_alerter_bot.models.stock import Stock
 
 
 def get_menu_keyboard():
