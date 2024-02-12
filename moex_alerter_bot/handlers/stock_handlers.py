@@ -12,9 +12,9 @@ from moex_alerter_bot.utils.states import AddStockForm
 
 async def got_ticker_name(message: types.Message, state: FSMContext):
     """Когда получили ticker_name, сохраняем его, меняем state и запрашиваем ввести short_name"""
-    await message.answer(text='Enter ticker short_name')
     await state.update_data(name=message.text.upper())
     await state.set_state(AddStockForm.SHORT_NAME)
+    await message.answer(text='Enter ticker short_name')
 
 
 async def got_ticker_short_name(message: types.Message, state: FSMContext):
@@ -38,13 +38,14 @@ async def got_ticker_short_name(message: types.Message, state: FSMContext):
 
 
 async def callback_setting(call: types.CallbackQuery, bot: Bot, callback_data: MenuAction, state: FSMContext):
+    await state.clear()
     match callback_data.action:
         case MenuActionType.SELECT:
             stocks = await db.get_stocks()
             await call.message.answer(text='Available stocks:', reply_markup=get_stock_selector_keyboard(stocks))
         case MenuActionType.ADD:
-            await call.message.answer(text='Enter ticker name:')
             await state.set_state(AddStockForm.NAME)
+            await call.message.answer(text='Enter ticker name:')
         case MenuActionType.DELETE:
             await call.message.answer('Enter in delete_setting')
 

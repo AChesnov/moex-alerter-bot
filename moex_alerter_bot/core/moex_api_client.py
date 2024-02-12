@@ -8,7 +8,7 @@ import holidays
 import httpx
 from bs4 import BeautifulSoup, element
 
-from moex_alerter_bot.config import LOGGER, MOEX_BOARD_ID, MOEX_BOARD_NAME, MOEX_ENGINES, MOEX_MARKETS
+from moex_alerter_bot.config import MOEX_BOARD_ID, MOEX_BOARD_NAME, MOEX_ENGINES, MOEX_MARKETS
 
 
 @dataclass
@@ -69,7 +69,6 @@ class MoexApiClient:
         stocks = []
         for row in rows:
             price = row.get('LAST') or row.get('MARKETPRICE') or row.get('PREVPRICE')
-            LOGGER.info(f'\n{row=}\n{price=}\n')
             if row.get('SHORTNAME') and price:
                 stocks.append(
                     StockInfo(name=row['SECID'], short_name=row['SHORTNAME'], price=round(Decimal(price), 2)),

@@ -13,6 +13,7 @@ jobs:
       env:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         CHAT_ID: ${{ secrets.CHAT_ID }}
+        DB_URL: ${{ secrets.DB_URL }}
         GIT_URL: "https://github.com/AChesnov/moex-alerter-bot.git"
         CONFIG_FILE: ".env"
         WORK_DIR: '/opt/git/moex-alerter-bot'
@@ -22,7 +23,7 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         password: ${{ secrets.VPS_PASSWORD }}
         port: 22
-        envs: BOT_TOKEN,GIT_URL,CONFIG_FILE,WORK_DIR,LOG_FILE
+        envs: BOT_TOKEN,GIT_URL,CONFIG_FILE,WORK_DIR,LOG_FILE,DB_URL,CHAT_ID
         script: |
           echo "Update repo sources"
           [ ! -d $WORK_DIR ] && mkdir -p /opt/git && cd /opt/git && git clone $GIT_URL
@@ -37,9 +38,11 @@ jobs:
           echo BOT_TOKEN = $BOT_TOKEN >> $CONFIG_FILE
           echo CHAT_ID = $CHAT_ID >> $CONFIG_FILE
           echo LOG_FILE = $LOG_FILE >> $CONFIG_FILE
-          echo WEBHOOK_URL = https://s251991.hostiman.com/moex_alerter_bot >> $CONFIG_FILE
+          echo DB_URL = $DB_URL >> $CONFIG_FILE
+          echo WEBHOOK_URL = https://62.217.179.248/moex_alerter_bot >> $CONFIG_FILE
           
           echo "Start service"
           /root/.local/bin/poetry install --without dev
+          /root/.local/bin/poetry run alembic upgrade head
           systemctl enable /opt/git/moex-alerter-bot/systemd/moex_alerter_bot.service
           systemctl restart moex_alerter_bot.service

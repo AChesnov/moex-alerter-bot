@@ -12,9 +12,9 @@ from moex_alerter_bot.utils.states import AddStockAnalyzeForm
 
 async def got_stock_top_limit(message: types.Message, state: FSMContext):
     """Когда получили top_limit для StockAnalyze, сохраняем его, меняем state и запрашиваем ввести bottom_limit"""
-    await message.answer(text='Enter bottom limit')
     await state.update_data(top_limit=Decimal(message.text))
     await state.set_state(AddStockAnalyzeForm.BOTTOM_LIMIT)
+    await message.answer(text='Enter bottom limit')
 
 
 async def got_stock_bottom_limit(message: types.Message, state: FSMContext):
@@ -42,12 +42,13 @@ async def callback_stock_analyze_selected(
     callback_data: StockAnalyzeAction,
     state: FSMContext,
 ):
+    await state.clear()
     match callback_data.action:
         case StockAnalyzeActionType.ADD:
             await state.set_state(AddStockAnalyzeForm.STOCK_ID)
             await state.update_data(stock_id=callback_data.stock_id)
-            await call.message.answer(text='Enter top limit:')
             await state.set_state(AddStockAnalyzeForm.TOP_LIMIT)
+            await call.message.answer(text='Enter top limit:')
         case StockAnalyzeActionType.DELETE:
             await db.delete_object(object_type=StockAnalyze, object_id=callback_data.stock_id)
         case StockAnalyzeActionType.SHOW:
