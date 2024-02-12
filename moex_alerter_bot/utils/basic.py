@@ -1,7 +1,9 @@
 from aiogram import Bot, Dispatcher
 from aiohttp.web import Application
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from moex_alerter_bot.config import LOGGER, WEBHOOK_URL
+from moex_alerter_bot.core.check_price import check_stocks_price
 from moex_alerter_bot.routes import register_routes
 from moex_alerter_bot.utils.commands import set_commands
 
@@ -15,6 +17,12 @@ async def set_web_hook(bot: Bot) -> None:
         LOGGER.info('Set webhook status: %s', result)
 
 
+async def start_scheduler(bot: Bot) -> None:
+    scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
+    scheduler.add_job(func=check_stocks_price, trigger='interval', minutes=1, kwargs={'bot': bot})
+    scheduler.start()
+
+
 async def on_startup(dispatcher: Dispatcher, bot: Bot, app: Application) -> None:
     """Обработчик запуска приложения, засылает webhook в телеграм"""
     await set_web_hook(bot=bot)
@@ -24,6 +32,9 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot, app: Application) -> None
 
     LOGGER.info('Set bot commands')
     await set_commands(bot=bot)
+
+    LOGGER.info('Start scheduler')
+    await start_scheduler(bot=bot)
 
 
 async def on_shutdown(bot: Bot) -> None:

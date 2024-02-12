@@ -16,9 +16,13 @@ lxml = "^5.1.0"
 sqlalchemy = "^2.0.25"
 alembic = "^1.13.1"
 asyncpg = "^0.29.0"
+apscheduler = "^3.10.4"
+holidays = "^0.42"
+prettytable = "^3.9.0"
 
 
 [tool.ruff]
+# https://docs.astral.sh/ruff/rules/
 line-length = 120
 select = [
     # Pyflakes
@@ -333,7 +337,9 @@ ignore = [
     "INP001",
     "S101",
     "PLW1508",
-    "S104"
+    "S104",
+    "RUF002",
+    "RUF001",
 ]
 
 [tool.ruff.format]
