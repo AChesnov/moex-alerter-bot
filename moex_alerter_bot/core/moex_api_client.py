@@ -1,24 +1,50 @@
 import datetime
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import ClassVar, Mapping
+from typing import Any, ClassVar
 from urllib.parse import urljoin
 
 import holidays
 import httpx
-from bs4 import BeautifulSoup, element
 
 from moex_alerter_bot.config import MOEX_BOARD_ID, MOEX_BOARD_NAME, MOEX_ENGINES, MOEX_MARKETS
+
+"""
+SECID - Идентификатор финансового инструмента
+BOARDID - Идентификатор режима торгов
+OPEN - Цена первой сделки
+LOW - Минимальная цена сделки
+HIGH - Максимальная цена сделки
+LAST - Цена последней сделки
+
+LCURRENTPRICE - Официальная текущая цена, средневзвешенная цена сделок заключенных за последние 10 минут
+LAST - Цена последней сделки
+
+"""
+
+
+@dataclass
+class SecuritiesResponseData:
+    securities: list[dict[str, Any]]
+    marketdata: list[dict[str, Any]]
 
 
 @dataclass
 class StockInfo:
     name: str
     short_name: str
-    price: Decimal | None = None
 
     def __repr__(self):
-        return f'StockInfo(name={self.name}, short_name={self.short_name}, price={self.price})'
+        return f'StockInfo(name={self.name}, short_name={self.short_name})'
+
+
+@dataclass
+class StockPrice:
+    name: str
+    price: Decimal
+
+    def __repr__(self):
+        return f'StockPrice(name={self.name}, price={self.price})'
 
 
 @dataclass
@@ -55,44 +81,45 @@ class MoexApiClient:
             return False
         return True
 
-    def parse_row_from_text(self, text) -> list[Mapping[str, str]]:
-        soup = BeautifulSoup(text, 'xml')
-        rows: list[element.Tag] = soup.find_all('row')
-        return [
-            row.attrs
-            for row in rows
-            if row.attrs.get('BOARDID') == self.board_id and row.attrs.get('BOARDNAME') == self.board_name
-        ]
-
     @staticmethod
-    def parse_stocks_info(rows: list[Mapping[str, str]]) -> list[StockInfo] | None:
-        stocks = []
-        for row in rows:
-            price = row.get('LAST') or row.get('MARKETPRICE') or row.get('PREVPRICE')
-            if row.get('SHORTNAME') and price:
-                stocks.append(
-                    StockInfo(name=row['SECID'], short_name=row['SHORTNAME'], price=round(Decimal(price), 2)),
-                )
-        return stocks
+    def convert_response(json_response: dict) -> SecuritiesResponseData:
+        return SecuritiesResponseData(
+            securities=[
+                dict(zip(json_response.get('securities').get('columns'), row))
+                for row in json_response.get('securities').get('data')
+            ],
+            marketdata=[
+                dict(zip(json_response.get('marketdata').get('columns'), row))
+                for row in json_response.get('marketdata').get('data')
+            ],
+        )
+
+    def _get_stock_info(self, securities: SecuritiesResponseData) -> StockInfo | None:
+        for row in securities.securities:
+            if row.get('BOARDID') == self.board_id:
+                return StockInfo(name=row['SECID'], short_name=row['SHORTNAME'])
+
+    def _get_stock_price(self, securities: SecuritiesResponseData) -> StockPrice | None:
+        for row in securities.marketdata:
+            stock_current_price = row.get('LAST') or row.get('LCURRENTPRICE')
+            if row.get('BOARDID') == self.board_id and stock_current_price:
+                return StockPrice(name=row['SECID'], price=round(Decimal(stock_current_price), 2))
 
     async def send_request(self, path: str):
         async with httpx.AsyncClient() as client:
             response = await client.get(urljoin(self.url, path))
-            return response.text
-
-    async def get_tickers(self) -> list[StockInfo]:
-        """Возвращаем информацию по акциям"""
-        path = f'/iss/engines/{self.engines}/markets/{self.markets}/securities.xml'
-        result = await self.send_request(path=path)
-        rows = self.parse_row_from_text(text=result)
-        stocks = self.parse_stocks_info(rows)
-        return stocks
+            return response.json()
 
     async def get_stock_info(self, stock_name: str) -> StockInfo | None:
         """Возвращаем информацию по акции если она есть"""
-        path = f'/iss/engines/{self.engines}/markets/{self.markets}/securities/{stock_name.upper()}.xml'
-        result = await self.send_request(path=path)
-        rows = self.parse_row_from_text(text=result)
-        stocks = self.parse_stocks_info(rows)
-        if stocks:
-            return stocks[0]
+        path = f'/iss/engines/{self.engines}/markets/{self.markets}/securities/{stock_name.upper()}.json'
+        response = await self.send_request(path=path)
+        securities_response = self.convert_response(json_response=response)
+        return self._get_stock_info(securities=securities_response)
+
+    async def get_stock_price(self, stock_name: str) -> StockPrice | None:
+        """Возвращаем информацию по акции если она есть"""
+        path = f'/iss/engines/{self.engines}/markets/{self.markets}/securities/{stock_name.upper()}.json'
+        response = await self.send_request(path=path)
+        securities_response = self.convert_response(json_response=response)
+        return self._get_stock_price(securities=securities_response)

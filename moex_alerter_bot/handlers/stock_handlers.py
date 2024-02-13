@@ -11,25 +11,19 @@ from moex_alerter_bot.utils.states import AddStockForm
 
 
 async def got_ticker_name(message: types.Message, state: FSMContext):
-    """Когда получили ticker_name, сохраняем его, меняем state и запрашиваем ввести short_name"""
+    """Когда получили ticker_name, проверяем что такой есть api_moex и сохраняем в БД"""
     await state.update_data(name=message.text.upper())
-    await state.set_state(AddStockForm.SHORT_NAME)
-    await message.answer(text='Enter ticker short_name')
-
-
-async def got_ticker_short_name(message: types.Message, state: FSMContext):
-    """Когда получили расширенное описание акции, проверяем что она доступна через moex_api и сохраняем в БД"""
-    await state.update_data(short_name=message.text)
     context_data = await state.get_data()
     await state.clear()
 
     moex_api = MoexApiClient()
-    if not await moex_api.get_stock_info(stock_name=context_data['name']):
+    stock_info = await moex_api.get_stock_info(stock_name=context_data['name'])
+    if not stock_info:
         await message.answer(text='Stock not found via moex_api')
         return
 
     try:
-        stock = Stock(name=context_data['name'], short_name=context_data['short_name'])
+        stock = Stock(name=stock_info.name, short_name=stock_info.short_name)
         await db.add_object(object_type=stock)
     except IntegrityError:
         await message.answer(text='Stock already exist')
