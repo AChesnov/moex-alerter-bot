@@ -13,7 +13,6 @@ def register_routes(dispatcher: Dispatcher):
     dispatcher.callback_query.register(stock_handlers.callback_setting, MenuAction.filter())
     dispatcher.callback_query.register(stock_handlers.callback_stock_selected, StockSelected.filter())
     dispatcher.message.register(stock_handlers.got_ticker_name, AddStockForm.NAME)
-    dispatcher.message.register(stock_handlers.got_ticker_short_name, AddStockForm.SHORT_NAME)
 
     dispatcher.callback_query.register(
         stock_analyze_handlers.callback_stock_analyze_selected,
