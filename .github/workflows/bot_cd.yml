@@ -39,7 +39,7 @@ jobs:
           echo CHAT_ID = $CHAT_ID >> $CONFIG_FILE
           echo LOG_FILE = $LOG_FILE >> $CONFIG_FILE
           echo DB_URL = $DB_URL >> $CONFIG_FILE
-          echo WEBHOOK_URL = https://62.217.179.248/moex_alerter_bot >> $CONFIG_FILE
+          echo WEBHOOK_URL = https://aleksandr-chesnov.ru/moex_alerter_bot >> $CONFIG_FILE
           
           echo "Start service"
           /root/.local/bin/poetry install --without dev
